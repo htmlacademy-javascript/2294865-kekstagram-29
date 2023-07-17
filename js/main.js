@@ -92,7 +92,7 @@ const createUniqueId = (min, max) => {
 };
 
 const generateCommentId = createUniqueId(1, 9999);
-const generatePhotoId = createUniqueId(1, 25);
+const generatePhotoId = createUniqueId(0, DESCRIPTIONS.length);
 
 /* создает комментарий */
 const createComment = () => ({
