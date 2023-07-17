@@ -23,5 +23,6 @@
   "engines": {
     "node": "18",
     "npm": "9"
-  }
+  },
+  "type": "module"
 }
