@@ -1,35 +1,83 @@
 import { EscapeKey } from './util.js';
 const commentTmp = document.querySelector('#modal-comment').content.querySelector('.social__comment');
+const modalBigPicture = document.querySelector('.big-picture');
 
-const modal = document.querySelector('.big-picture');
-const modalContent = {
-  Image: modal.querySelector('.big-picture__img img'),
-  Likes: modal.querySelector('.likes-count'),
-  Comments: modal.querySelector('.comments-count'),
-  Description: modal.querySelector('.social__caption'),
+const postview = {
+  image: modalBigPicture.querySelector('.big-picture__img img'),
+  likes: modalBigPicture.querySelector('.likes-count'),
+  comments: modalBigPicture.querySelector('.comments-count'),
+  description: modalBigPicture.querySelector('.social__caption'),
+  list: modalBigPicture.querySelector('.social__comments')
 };
 
-const modalList = modal.querySelector('.social__comments');
+const commentCountField = document.querySelector('.social__comment-count');
+const shownComments = document.querySelector('.shown-comments-count');
+const refreshButton = document.querySelector('.comments-loader');
 
-const commentCount = document.querySelector('.social__comment-count');
-const commentLoader = document.querySelector('.comments-loader');
+const COMMENT_STEP = 5;
 
-const createComment = ({url, likes, description,comments}) => {
-  modalContent.Image.src = url;
-  modalContent.Likes.textContent = likes;
-  modalContent.Comments.textContent = comments.length;
-  modalContent.Description.textContent = description;
-  const fragment = document.createDocumentFragment();
-  comments.forEach(({avatar, message, name}) => {
-    const newComment = commentTmp.cloneNode(true);
-    newComment.querySelector('.social__picture').src = avatar;
-    newComment.querySelector('.social__picture').alt = name;
-    newComment.querySelector('.social__text').textContent = message;
-    fragment.appendChild(newComment);
-  });
-  modalList.innerHTML = '';
-  modalList.appendChild(fragment);
-};
+
+/* Возможно ли без класса обойтись? Так и не придумал ничего*/
+
+
+class Article {
+  constructor(picture) {
+    this.picture = picture;
+    this.shownCommentsCount = 0;
+  }
+
+  clickAddMore() {
+    this.shownCommentsCount += COMMENT_STEP;
+
+    if (this.shownCommentsCount > this.picture.comments.length) {
+      this.shownCommentsCount = this.picture.comments.length;
+      refreshButton.classList.add('hidden');
+    }
+
+    this.refreshComments();
+  }
+
+  refreshComments() {
+    postview.list.innerHTML = '';
+    if (this.picture.comments.length === 0) {
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < this.shownCommentsCount; i++) {
+      const newComment = commentTmp.cloneNode(true);
+      const {avatar, name, message} = this.picture.comments[i];
+      newComment.querySelector('.social__picture').src = avatar;
+      newComment.querySelector('.social__picture').alt = name;
+      newComment.querySelector('.social__text').textContent = message;
+      fragment.appendChild(newComment);
+    }
+    postview.list.appendChild(fragment);
+    shownComments.textContent = this.shownCommentsCount;
+    commentCountField.classList.remove('hidden');
+    if (this.shownCommentsCount < this.picture.comments.length) {
+      refreshButton.classList.remove('hidden');
+    }
+  }
+
+  show() {
+    postview.image.src = this.picture.url;
+    postview.likes.textContent = this.picture.likes;
+    postview.comments.textContent = String(this.picture.comments.length);
+    postview.description.textContent = this.picture.description;
+
+    if (this.picture.comments.length !== 0) {
+      if (COMMENT_STEP > this.picture.comments.length) {
+        this.shownCommentsCount = this.picture.comments.length;
+      } else {
+        this.shownCommentsCount = COMMENT_STEP;
+      }
+    }
+
+    this.refreshComments();
+  }
+}
+
+const picturesCache = {};
 
 const onDocumentKeydown = (evt) => {
   if (EscapeKey(evt)) {
@@ -38,24 +86,41 @@ const onDocumentKeydown = (evt) => {
   }
 };
 
-function showModal(picture) {
-  modal.classList.remove('hidden');
+
+const showBackDrop = () => {
+  modalBigPicture.classList.remove('hidden'); /* убирает класс hidden */
   document.body.classList.add('modal-open');
-  commentCount.classList.add('hidden');
-  commentLoader.classList.add('hidden');
+  commentCountField.classList.add('hidden');
+  refreshButton.classList.add('hidden');
   document.addEventListener('keydown', onDocumentKeydown);
-  createComment(picture);
+};
+
+
+function showModal(picture) {
+  let pictureModal = picturesCache[picture.id];
+
+  showBackDrop();
+
+  if (pictureModal) {
+    pictureModal.show();
+    return;
+  }
+
+  pictureModal = new Article(picture);
+  pictureModal.show();
+
+  picturesCache[picture.id] = pictureModal;
+
+  refreshButton.addEventListener('click', () => pictureModal.clickAddMore());
 }
 
 function closeModal() {
-  modal.classList.add('hidden');
+  modalBigPicture.classList.add('hidden');
   document.body.classList.remove('modal-open');
-  commentCount.classList.remove('hidden');
-  commentLoader.classList.remove('hidden');
   document.removeEventListener('keydown', onDocumentKeydown);
 }
 
-modal.addEventListener('click', (evt) => {
+modalBigPicture.addEventListener('click', (evt) => {
   if (evt.target.matches('.big-picture__cancel')) {
     closeModal();
   }
