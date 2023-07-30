@@ -1,5 +1,4 @@
-const MAX_HASHTAG_COUNT = 5; /* Массив хештегов*/
-const VALID_SYMBOLS = /^#[a-zа-яё0-9]{1,19}$/i; /* Расрешенные символы */
+import {MAX_HASHTAG_COUNT, VALID_SYMBOLS} from './filtersdata.js';
 
 const hashTags = (value) => value.trim().split(' ').filter((el) => el.length !== 0);
 
