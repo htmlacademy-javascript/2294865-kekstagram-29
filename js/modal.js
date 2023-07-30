@@ -1,4 +1,4 @@
-import { EscapeKey } from './util.js';
+import { isEscapeKey } from './util.js';
 const commentTmp = document.querySelector('#modal-comment').content.querySelector('.social__comment');
 const modalBigPicture = document.querySelector('.big-picture');
 
@@ -80,7 +80,7 @@ class Article {
 const picturesCache = {};
 
 const onDocumentKeydown = (evt) => {
-  if (EscapeKey(evt)) {
+  if (isEscapeKey(evt)) {
     evt.preventDefault();
     closeModal();
   }
