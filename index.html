@@ -32,11 +32,13 @@
       <section class="img-upload">
         <div class="img-upload__wrapper">
           <h2 class="img-upload__title  visually-hidden">Загрузка фотографии</h2>
-          <form class="img-upload__form" id="upload-select-image" autocomplete="off">
+          <form class="img-upload__form" id="upload-select-image" method="post"
+            action="https://29.javascript.pages.academy/kekstagram" enctype="multipart/form-data" autocomplete="off">
 
             <!-- Изначальное состояние поля для загрузки изображения -->
             <fieldset class="img-upload__start">
-              <input type="file" id="upload-file" class="img-upload__input  visually-hidden" name="filename" required>
+              <input type="file" id="upload-file" class="img-upload__input  visually-hidden" name="filename" value=""
+                required>
               <label for="upload-file" class="img-upload__label  img-upload__control">Загрузить</label>
             </fieldset>
 
@@ -125,10 +127,14 @@
                 <!-- Добавление хэш-тегов и комментария к изображению -->
                 <fieldset class="img-upload__text text">
                   <div class="img-upload__field-wrapper">
-                    <input class="text__hashtags" name="hashtags" placeholder="#ХэшТег">
+                    <input class="text__hashtags" name="hashtags" placeholder="#ХэшТег" value="">
                   </div>
                   <div class="img-upload__field-wrapper">
                     <textarea class="text__description" name="description" placeholder="Ваш комментарий..."></textarea>
+                    <textarea class="text__description" name="description" placeholder="Ваш комментарий..."
+                      data-pristine-maxlength="140"
+                      data-pristine-maxlength-message="Максимальная длина комментария 140 символов">
+                  </textarea>
                   </div>
                 </fieldset>
 
@@ -214,11 +220,7 @@
   <!-- Шаблон комментария в модальном окне -->
   <template id="modal-comment">
     <li class="social__comment">
-      <img
-        class="social__picture"
-        src=""
-        alt=""
-        width="35" height="35">
+      <img class="social__picture" src="" alt="" width="35" height="35">
       <p class="social__text"></p>
     </li>
   </template>
