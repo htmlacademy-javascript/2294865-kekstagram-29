@@ -1,8 +1,11 @@
 import '/vendor/pristine/pristine.min.js';
-import { isEscapeKey } from './util.js';
 import '/vendor/nouislider/nouislider.js';
-import { isHashtagValid, isRepeatedHashTags, isHashTagLimitExceeded } from './validators.js';
+import { isHashtagValid, isRepeatedHashTags, isHashTagLimitExceeded } from './validation.js';
 import { FILTERS } from './filtersdata.js';
+import {sendData} from './api-fetch.js';
+import {messageModal} from './modal-message.js';
+import { modals } from './modal.js';
+
 
 class Editor {
   constructor(form) {
@@ -10,6 +13,16 @@ class Editor {
     this.backDrop = form.querySelector('.img-upload__overlay');
     this.closeButton = form.querySelector('.img-upload__cancel');
     this.uploadInput = form.querySelector('.img-upload__input');
+    this.submitButton = form.querySelector('.img-upload__submit');
+    this.scaleBox = form.querySelector('.img-upload__scale'); // Поиск поля редактирования масштаба картинки
+    this.scaleInput = form.querySelector('.scale__control--value');
+    this.scaleDecreaseButton = form.querySelector('.scale__control--smaller');
+    this.scaleIncreaseButton = form.querySelector('.scale__control--bigger');
+    this.uploadedImage = form.querySelector('.img-upload__preview img');
+    this.sliderContainer = form.querySelector('.img-upload__effect-level'); //Slide
+    this.effectDataField = form.querySelector('.effect-level__value');
+    this.sliderElement = form.querySelector('.effect-level__slider');
+    this.effectsList = form.querySelector('.effects__list');
     this.hashTagFiled = form.querySelector('.text__hashtags');
     this.textareaField = form.querySelector('.text__description');
     this.pristine = new Pristine(form, {
@@ -48,67 +61,74 @@ class Editor {
     this.form.addEventListener('submit', (evt) => this.onSubmit(evt));
   }
 
-  onDocumentKeydown(evt) {
-    if (isEscapeKey(evt)) {
-      evt.preventDefault();
-      if (evt.target.closest('.img-upload__field-wrapper')) {
-        return;
-      }
-      this.closeBackDrop();
+  toggle (state) {
+    if (state) {
+      modals.add(this);
+      this.showModal();
+    } else {
+      this.closeModal();
     }
   }
 
-  showBackdrop() {
+  showModal () {
     this.backDrop.classList.remove('hidden');
     document.body.classList.add('modal-open');
+    this.createSlider();
+    this.scaleBox.addEventListener('click', (evt) => this.onResize(evt));
+    this.effectsList.addEventListener('change', (evt) => this.onChangeEffect(evt));
   }
 
-  closeBackDrop() {
+  closeModal() {
     this.backDrop.classList.add('hidden');
     document.body.classList.remove('modal-open');
     this.uploadInput.value = '';
+    this.uploadedImage.removeAttribute('style');
+    this.sliderElement.noUiSlider.destroy();
     this.hashTagFiled.value = '';
     this.textareaField.value = '';
     /* сбрасывание значений */
+    this.scaleBox.removeEventListener('click', (evt) => this.onResize(evt));
+    this.effectsList.removeEventListener('change', (evt) => this.onChangeEffect(evt));
   }
 
   onSubmit(evt) {
     evt.preventDefault();
-    const valid = this.pristine.validate();
-    window.console.log('!!!', valid);
-  }
+    const isValid = this.pristine.validate();
+    if (isValid) {
+      this.blockSubmitButton();
 
-  toggle(state) {
-    if (state) {
-      this.showBackdrop();
-      document.addEventListener('keydown', (evt) => this.onDocumentKeydown(evt));
-      this.scaleBox.addEventListener('click', (evt) => this.onResize(evt));
-      this.effectsList.addEventListener('change', (evt) => this.onChangeEffect(evt));
-    } else {
-      this.closeBackDrop();
-      document.removeEventListener('keydown', (evt) => this.onDocumentKeydown(evt));
-      this.scaleBox.removeEventListener('click', (evt) => this.onResize(evt));
-      this.effectsList.removeEventListener('change', (evt) => this.onResize(evt));
+      sendData('submit', new FormData(evt.target))
+        .then(() => this.closeModal())
+        .then(() => messageModal.show('success'))
+        .catch(() => messageModal.show('error'))
+        .finally(() => this.unblockSubmitButton());
     }
   }
 
+  blockSubmitButton() {
+    this.submitButton.disabled = true;
+  }
+
+  unblockSubmitButton() {
+    this.submitButton.disabled = false;
+  }
+
+
+  hide () {
+    this.closeModal();
+    modals.remove(this);
+  }
+
+
   onResize(evt) {
-    const currentInputValue = Number(this.scaleInput.value.replace('%', '')); /* /[^d\]/g,"" лучше все же сделать так? */
+    const currentInputValue = Number(this.scaleInput.value.replace('%', ''));
     let newInputValue;
     if (evt.target === this.scaleIncreaseButton) {
-      //if (currentInputValue === 25) {
-      // return;
-      // }
-
       newInputValue = Math.min(100, currentInputValue + 25);
       this.scaleInput.value = `${newInputValue}%`;
       this.uploadedImage.style.transform = `scale(${newInputValue / 100})`;
     }
     if (evt.target === this.scaleDecreaseButton) {
-      // if (currentInputValue === 100) {
-      //  return;
-      // }
-
       newInputValue = Math.max(25, currentInputValue - 25);
       this.scaleInput.value = `${newInputValue}%`;
       this.uploadedImage.style.transform = `scale(${newInputValue / 100})`;
@@ -138,6 +158,7 @@ class Editor {
         },
       },
     });
+    this.effectsList.addEventListener('change', (evt) => this.onChangeEffect(evt));
   }
 
   onChangeEffect(evt) {
@@ -163,7 +184,8 @@ class Editor {
     this.sliderContainer.style.display = 'block';
     this.sliderElement.noUiSlider.on('update', () => {
       this.effectDataField.value = `${this.sliderElement.noUiSlider.get()}`;
-      this.uploadedImage.style.filter = `${filter}(${this.effectDataField.value}${unit})`;
+      const getFilterValue = () => `${filter}(${this.effectDataField.value}${unit})`;
+      this.uploadedImage.style.filter = getFilterValue();
     });
   }
 
@@ -173,6 +195,4 @@ class Editor {
   }
 }
 
-const editor = new Editor(document.querySelector('.img-upload__form'));
-
-editor.init();
+export const editor = new Editor(document.querySelector('.img-upload__form'));

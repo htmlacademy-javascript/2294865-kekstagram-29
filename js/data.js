@@ -1,4 +1,4 @@
-import {getRandomInteger, createUniqueId, getRandomArrayElement} from './util.js';
+import { getRandomInteger, createUniqueId, getRandomArrayElement } from './util.js';
 
 const MESSAGES = ['Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -87,12 +87,11 @@ const createPhotoDescription = () => {
     url: `photos/${photoId}.jpg`,
     description: DESCRIPTIONS[photoId - 1],
     likes: getRandomInteger(15, 200),
-    comments: Array.from({length: getRandomInteger(0, 30)}, createComment)
+    comments: Array.from({ length: getRandomInteger(0, 30) }, createComment)
   };
 };
 
 
-const createPhotoDescriptions = () => Array.from({length: PHOTO_OBJECTS_COUNT}, createPhotoDescription);
+const createPhotoDescriptions = () => Array.from({ length: PHOTO_OBJECTS_COUNT }, createPhotoDescription);
 
-export {createPhotoDescriptions};
-
+export { createPhotoDescriptions };

@@ -2,8 +2,6 @@ const MAX_HASHTAG_COUNT = 5;
 
 const VALID_SYMBOLS = /^#[a-zа-яё0-9]{1,19}$/i;
 
-//const SCALE_STEP = 25;
-
 const FILTERS = {
   chrome: {
     filter: 'grayscale',
