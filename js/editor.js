@@ -4,7 +4,7 @@ import { isHashtagValid, isRepeatedHashTags, isHashTagLimitExceeded } from './va
 import { FILTERS } from './filtersdata.js';
 import {sendData} from './api-fetch.js';
 import {messageModal} from './modal-message.js';
-import { modals } from './modal.js';
+import { modalManager } from './modal-manager.js';
 
 
 class Editor {
@@ -30,12 +30,18 @@ class Editor {
       errorTextParent: 'img-upload__field-wrapper',
       errorTextTag: 'div',
     });
+    this.onResize = this.onResize.bind(this);
   }
 
   init() {
     this.uploadInput.addEventListener('change', (evt) => {
       this.toggle(true);
-      this.showImage(evt);
+      const inputElement = evt.target;
+      const fileList = inputElement.files;
+      const file = fileList[0];
+      const imageSrc = URL.createObjectURL(file);
+      this.image = imageSrc;
+      this.showImage();
     });
 
     this.closeButton.addEventListener('click', () => this.toggle(false));
@@ -63,7 +69,7 @@ class Editor {
 
   toggle (state) {
     if (state) {
-      modals.add(this);
+      modalManager.add(this);
       this.showModal();
     } else {
       this.closeModal();
@@ -74,7 +80,7 @@ class Editor {
     this.backDrop.classList.remove('hidden');
     document.body.classList.add('modal-open');
     this.createSlider();
-    this.scaleBox.addEventListener('click', (evt) => this.onResize(evt));
+    this.scaleBox.addEventListener('click', this.onResize);
     this.effectsList.addEventListener('change', (evt) => this.onChangeEffect(evt));
   }
 
@@ -87,8 +93,12 @@ class Editor {
     this.hashTagFiled.value = '';
     this.textareaField.value = '';
     /* сбрасывание значений */
-    this.scaleBox.removeEventListener('click', (evt) => this.onResize(evt));
+    this.scaleBox.removeEventListener('click',this.onResize);
     this.effectsList.removeEventListener('change', (evt) => this.onChangeEffect(evt));
+
+    if (this.image) {
+      URL.revokeObjectURL(this.image);
+    }
   }
 
   onSubmit(evt) {
@@ -116,7 +126,7 @@ class Editor {
 
   hide () {
     this.closeModal();
-    modals.remove(this);
+    modalManager.remove(this);
   }
 
 
@@ -190,8 +200,8 @@ class Editor {
   }
 
 
-  showImage(image) {
-    this.image = image;
+  showImage() {
+    //console.log ("showImage", this.image);
   }
 }
 
