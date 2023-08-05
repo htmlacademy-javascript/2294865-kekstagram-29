@@ -20,5 +20,3 @@ const renderPicture = (pictures) => {
 };
 
 export {renderPicture};
-
-

@@ -1,4 +1,4 @@
-import {modals} from './modal.js';
+import {modalManager} from './modal-manager.js';
 
 class ModalMessage {
   constructor () {
@@ -21,7 +21,7 @@ class ModalMessage {
     }
 
     document.body.appendChild(this.modal);
-    modals.add(this);
+    modalManager.add(this);
 
     this.modal.addEventListener('click', this.onClose);
   }
@@ -34,7 +34,7 @@ class ModalMessage {
     this.isShowed = false;
     this.modal.removeEventListener('click', this.onClose);
     this.modal.remove();
-    modals.remove(this);
+    modalManager.remove(this);
   }
 
   onClose (evt) {

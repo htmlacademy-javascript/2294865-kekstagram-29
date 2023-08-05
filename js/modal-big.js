@@ -11,7 +11,8 @@ const postview = {
 };
 
 const commentCountField = document.querySelector('.social__comment-count');
-const shownComments = document.querySelector('.shown-comments-count');
+const commentCurrent = document.querySelector('.social__comment-count > span');
+const commentsTotal = document.querySelector('.comments-count');
 const refreshButton = document.querySelector('.comments-loader');
 
 const COMMENT_STEP = 5;
@@ -49,7 +50,7 @@ class Article {
       fragment.appendChild(newComment);
     }
     postview.list.appendChild(fragment);
-    shownComments.textContent = this.shownCommentsCount;
+    commentCurrent.textContent = this.shownCommentsCount;
     commentCountField.classList.remove('hidden');
     if (this.shownCommentsCount < this.picture.comments.length) {
       refreshButton.classList.remove('hidden');
@@ -68,6 +69,7 @@ class Article {
       } else {
         this.shownCommentsCount = COMMENT_STEP;
       }
+      commentsTotal.textContent = this.picture.comments.length;
     }
 
     this.refreshComments();
