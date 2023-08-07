@@ -55,8 +55,6 @@ class Gallery {
     }
   }
 
-
-
   render() {
     const picturesList = document.querySelectorAll('.pictures');
 
