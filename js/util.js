@@ -45,6 +45,24 @@ const showAlert = (message) => {
     alertContainer.remove();
   }, 5000);
 };
+/**
+* debouncing, executes the function if there was no new event in $wait milliseconds
+* @param func
+* @param wait
+* @param scope
+* @returns {Function}
+*/
+const debounce = function (func, wait, scope) {
+  var timeout;
+  return function () {
+    var context = scope || this, args = arguments;
+    var later = function () {
+      timeout = null;
+      func.apply(context, args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
 
-
-export {getRandomInteger, createUniqueId, getRandomArrayElement, isEscapeKey, isEnterKey,showAlert};
+export { getRandomInteger, createUniqueId, getRandomArrayElement, isEscapeKey, isEnterKey, showAlert, debounce };

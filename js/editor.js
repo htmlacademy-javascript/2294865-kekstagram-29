@@ -81,7 +81,7 @@ class Editor {
     document.body.classList.add('modal-open');
     this.createSlider();
     this.scaleBox.addEventListener('click', this.onResize);
-    this.effectsList.addEventListener('change', (evt) => this.onChangeEffect(evt));
+    this.effectsList.addEventListener('change',this.onChangeEffect);
   }
 
   closeModal() {
@@ -94,7 +94,7 @@ class Editor {
     this.textareaField.value = '';
     /* сбрасывание значений */
     this.scaleBox.removeEventListener('click',this.onResize);
-    this.effectsList.removeEventListener('change', (evt) => this.onChangeEffect(evt));
+    this.effectsList.removeEventListener('change', this.onChangeEffect);
 
     if (this.image) {
       URL.revokeObjectURL(this.image);
@@ -206,3 +206,4 @@ class Editor {
 }
 
 export const editor = new Editor(document.querySelector('.img-upload__form'));
+
