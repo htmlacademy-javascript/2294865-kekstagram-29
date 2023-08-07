@@ -3,11 +3,10 @@ import { isEscapeKey } from './util.js';
 class ModalManager {
   constructor() {
     this.showed = [];
-    this.onClose = this.onKeydown.bind(this);
+    this.onKeydown = this.onKeydown.bind(this);
   }
 
   add(modal) {
-    window.console.log(modal);
     this.showed.push(modal);
   }
 
@@ -41,10 +40,10 @@ class ModalManager {
   }
 
   init() {
-    document.addEventListener('keydown', (evt) => this.onKeydown(evt), true);
+    document.addEventListener('keydown', this.onKeydown);
   }
 }
 
 export const modalManager = new ModalManager();
 
-ModalManager.init();
+modalManager.init();

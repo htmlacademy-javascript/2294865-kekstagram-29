@@ -1,15 +1,15 @@
 
 import {getData} from './api-fetch.js';
 import {showAlert} from './util.js';
-import Gallary from './gallery.js';
+import Gallery from './gallery.js';
 import './editor.js';
 import {editor} from './editor.js';
-import '.modal-manager.js/';
+import './modal-manager.js';
 
 
 getData('fetch')
   .then((pictures) => {
-    const gallery = new Gallary(pictures);
+    const gallery = new Gallery(pictures);
     gallery.render();
   })
   .catch(
