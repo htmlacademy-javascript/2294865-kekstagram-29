@@ -63,7 +63,7 @@ class Gallery {
     }
 
     renderPicture(this.photoList);
-
+    /*render*/
   }
 
 }
