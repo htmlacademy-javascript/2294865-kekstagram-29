@@ -53,10 +53,10 @@ const showAlert = (message) => {
 * @returns {Function}
 */
 const debounce = function (func, wait, scope) {
-  var timeout;
+  let timeout;
   return function () {
-    var context = scope || this, args = arguments;
-    var later = function () {
+    const context = scope || this, args = arguments;
+    const later = function () {
       timeout = null;
       func.apply(context, args);
     };

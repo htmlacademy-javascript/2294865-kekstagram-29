@@ -2,10 +2,10 @@ import '/vendor/pristine/pristine.min.js';
 import '/vendor/nouislider/nouislider.js';
 import { isHashtagValid, isRepeatedHashTags, isHashTagLimitExceeded } from './validation.js';
 import { FILTERS } from './filtersdata.js';
-import {sendData} from './api-fetch.js';
-import {messageModal} from './modal-message.js';
+import { sendData } from './api-fetch.js';
+import { messageModal } from './modal-message.js';
 import { modalManager } from './modal-manager.js';
-
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 class Editor {
   constructor(form) {
@@ -34,13 +34,13 @@ class Editor {
   }
 
   init() {
-    this.uploadInput.addEventListener('change', (evt) => {
+    this.uploadInput.addEventListener('change', () => {
       this.toggle(true);
-      const inputElement = evt.target;
-      const fileList = inputElement.files;
-      const file = fileList[0];
-      const imageSrc = URL.createObjectURL(file);
-      this.image = imageSrc;
+      //const inputElement = evt.target;
+      //const fileList = inputElement.files;
+      //const file = fileList[0];
+      //const imageSrc = URL.createObjectURL(file);
+      //this.image = imageSrc;
       this.showImage();
     });
 
@@ -67,7 +67,7 @@ class Editor {
     this.form.addEventListener('submit', (evt) => this.onSubmit(evt));
   }
 
-  toggle (state) {
+  toggle(state) {
     if (state) {
       modalManager.add(this);
       this.showModal();
@@ -76,12 +76,12 @@ class Editor {
     }
   }
 
-  showModal () {
+  showModal() {
     this.backDrop.classList.remove('hidden');
     document.body.classList.add('modal-open');
     this.createSlider();
     this.scaleBox.addEventListener('click', this.onResize);
-    this.effectsList.addEventListener('change',this.onChangeEffect);
+    this.effectsList.addEventListener('change', this.onChangeEffect);
   }
 
   closeModal() {
@@ -93,12 +93,12 @@ class Editor {
     this.hashTagFiled.value = '';
     this.textareaField.value = '';
     /* сбрасывание значений */
-    this.scaleBox.removeEventListener('click',this.onResize);
+    this.scaleBox.removeEventListener('click', this.onResize);
     this.effectsList.removeEventListener('change', this.onChangeEffect);
 
-    if (this.image) {
-      URL.revokeObjectURL(this.image);
-    }
+    // if (this.image) {
+    //URL.revokeObjectURL(this.image);
+    // }
   }
 
   onSubmit(evt) {
@@ -124,7 +124,7 @@ class Editor {
   }
 
 
-  hide () {
+  hide() {
     this.closeModal();
     modalManager.remove(this);
   }
@@ -157,14 +157,14 @@ class Editor {
       step: 1,
       connect: 'lower',
       format: {
-        to: function (sliderValue) {
-          if (Number.isInteger(sliderValue)) {
-            return sliderValue;
+        to: function (GetsliderValue) {
+          if (Number.isInteger(GetsliderValue)) {
+            return GetsliderValue;
           }
-          return sliderValue.toFixed(1);
+          return GetsliderValue.toFixed(1);
         },
-        from: function (sliderValue) {
-          return parseFloat(sliderValue);
+        from: function (GetsliderValue) {
+          return parseFloat(GetsliderValue);
         },
       },
     });
@@ -201,9 +201,19 @@ class Editor {
 
 
   showImage() {
-    //console.log ("showImage", this.image);
+    this.image = this.uploadInput.files[0];
+    const fileName = this.image.name.toLowerCase();
+
+    const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+
+    if (matches) {
+      const imageUrl = URL.createObjectURL(this.image);
+      this.uploadedImage.src = imageUrl;
+      Array.from(this.prewiewImages).forEach((el) => {
+        el.style.backgroundImage = `url(${imageUrl})`;
+      });
+    }
   }
 }
-
 export const editor = new Editor(document.querySelector('.img-upload__form'));
 
