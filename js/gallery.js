@@ -12,8 +12,9 @@ class Gallery {
     this.onChangeViewClick = this.onChangeViewClick.bind(this);
 
     if (photoList.lenght > 0) {
-      filters.classList.remove('.img-filters--inactive');
+      filters.classList.remove('img-filters--inactive');
       form.addEventListener('click', debounce(this.onChangeViewClick, 5000));
+
       pictures.addEventListener('click', (evt) => {
         const picturesId = evt.target.closest('[data-picture-id]');
         if (!picturesId) {
@@ -29,7 +30,7 @@ class Gallery {
 
   onChangeViewClick(evt) {
     document.querySelector('.img-filters__button--active').classList.remove('img-filters__button--active');
-    evt.target.classList.add('.img-filters__button--active');
+    evt.target.classList.add('img-filters__button--active');
 
     switch (evt.target.id) {
 
@@ -39,7 +40,7 @@ class Gallery {
         return;
       }
       case 'filter-random': {
-        this.photolist = this.original.slice().sort((_x, _y) => Math.random() - 0.5).slice(0, 10);
+        this.photolist = this.original.slice().sort(() => Math.random() - 0.5).slice(0, 10);
         this.render();
         return;
       }
@@ -56,7 +57,7 @@ class Gallery {
   }
 
   render() {
-    const picturesList = document.querySelectorAll('.pictures');
+    const picturesList = document.querySelectorAll('.picture');
 
     for (let i = 0; i < picturesList.lenght; i++) {
       picturesList[i].remove();
